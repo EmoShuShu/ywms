@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ResponseOrderServiceImpl implements ResponseOrderService{
@@ -92,6 +97,27 @@ public class ResponseOrderServiceImpl implements ResponseOrderService{
         //    使用我们刚刚在 Repository 中定义的新方法。
         return responseOrderRepository.findByWorkOrderId(workOrderId)
                 .orElseThrow(() -> new RuntimeException("查看失败：该工单还没有回单。"));
+    }
+
+    @Override
+    public List<ResponseOrder> findAllByApplicantId(Integer applicantId) {
+        // 1. 根据申请人ID，查询他创建的所有工单
+        List<WorkOrder> workOrders = workOrderRepository.findByApplicantId(applicantId);
+
+        if (workOrders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. 从工单列表中，提取出所有的 orderId (工单的主键/ID)
+        // 这一步得到的是一个 List<String>
+        List<String> workOrderIds = workOrders.stream()
+                .map(WorkOrder::getOrderId) // 假设工单的ID字段getter是getOrderId()
+                .collect(Collectors.toList());
+
+        // 3. vvv--- 这是核心修改 ---vvv
+        //    调用 Repository 中正确命名的 findByWorkOrderIdIn 方法
+        return responseOrderRepository.findByWorkOrderIdIn(workOrderIds);
+        //    ^^^--------------------^^^
     }
 
 

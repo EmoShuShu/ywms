@@ -66,4 +66,6 @@ public interface WorkOrderRepository extends JpaRepository <WorkOrder,String>{
     @Query("SELECT COUNT(w) FROM WorkOrder w WHERE w.orderStatus IN (5, 6)")
     int countTotalFinished();
 
+    List<WorkOrder> findByApplicantId(Integer applicantId);
+
 }

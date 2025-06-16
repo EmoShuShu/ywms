@@ -3,6 +3,8 @@ package com.ywms.service;
 import com.ywms.dao.ResponseOrder;
 import com.ywms.dto.ResponseOrderRequest;
 
+import java.util.List;
+
 public interface ResponseOrderService {
     public ResponseOrder getResponseOrderById(String id);
 
@@ -22,5 +24,8 @@ public interface ResponseOrderService {
      * @return 查找到的回单对象。
      */
     ResponseOrder getResponseOrderByWorkOrderId(String workOrderId, int currentIdentityId);
+
+
+    List<ResponseOrder> findAllByApplicantId(Integer applicantId);
 
 }
