@@ -20,6 +20,12 @@ public interface WorkOrderRepository extends JpaRepository <WorkOrder,String>{
      */
     List<WorkOrder> findByApplicantId(int applicantId);
 
+    List<WorkOrder> findByApproverIdA(int allocatedId);
+
+    List<WorkOrder> findByApproverIdB(int allocatedId);
+
+    List<WorkOrder> findByApproverIdC(int allocatedId);
+
     /**
      * 根据工单状态查找所有工单 (用于审批人员查看)
      * @param status 工单状态码
@@ -33,6 +39,8 @@ public interface WorkOrderRepository extends JpaRepository <WorkOrder,String>{
      * @return 指派给该操作人员的工单列表
      */
     List<WorkOrder> findByRecipientId(int recipientId);
+
+    List<WorkOrder> findByAllocatedId(int allocatedId);
 
     /**
      * 统计在指定时间范围内发起的工单总数。

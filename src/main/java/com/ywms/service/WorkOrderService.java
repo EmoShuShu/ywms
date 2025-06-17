@@ -14,6 +14,8 @@ public interface WorkOrderService {
 
     List<WorkOrder> getVisibleWorkOrders(int currentUserId);
 
+    List<WorkOrder> getDoneWorkOrders(int currentUserId);
+
     /**
      * 撤回一个工单。
      * @param orderId 要撤回的工单ID。

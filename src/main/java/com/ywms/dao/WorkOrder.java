@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @Table(name="workorder")
 public class WorkOrder {
@@ -50,6 +48,18 @@ public class WorkOrder {
 
     @Column
     private LocalDateTime deadline;
+
+    @Column
+    private int approverIdA;
+
+    @Column
+    private int approverIdB;
+
+    @Column
+    private int approverIdC;
+
+    @Column
+    private int allocatedId;
 
     public String getOrderId() {
         return orderId;
@@ -153,5 +163,37 @@ public class WorkOrder {
 
     public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
+    }
+
+    public int getApproverIdA() {
+        return approverIdA;
+    }
+
+    public void setApproverIdA(int approveIdA) {
+        this.approverIdA = approveIdA;
+    }
+
+    public int getApproverIdB() {
+        return approverIdB;
+    }
+
+    public void setApproverIdB(int approverIdB) {
+        this.approverIdB = approverIdB;
+    }
+
+    public int getApproverIdC() {
+        return approverIdC;
+    }
+
+    public void setApproverIdC(int approverIdC) {
+        this.approverIdC = approverIdC;
+    }
+
+    public int getAllocatedId() {
+        return allocatedId;
+    }
+
+    public void setAllocatedId(int allocatedId) {
+        this.allocatedId = allocatedId;
     }
 }

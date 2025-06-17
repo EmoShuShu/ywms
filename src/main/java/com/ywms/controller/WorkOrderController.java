@@ -49,11 +49,42 @@ public class WorkOrderController {
     }
 
     /**
-     * 查看对当前用户可见的工单列表
+     * 查看对当前用户已完成的工单列表
      * HTTP Method: GET
      * URL: /api/workorders
      */
     @GetMapping
+    public ResponseEntity<Response<?>> getDoneWorkOrders(HttpSession session) {
+
+        Object userDbIdObj = session.getAttribute("userDbId");
+
+        if (userDbIdObj == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Response.newFail("用户未登录，无法查看工单"));
+        }
+
+        int currentIdentityId = (int) userDbIdObj;
+
+        try {
+            List<WorkOrder> workOrders = workOrderService.getDoneWorkOrders(currentIdentityId);
+
+            return ResponseEntity.ok(Response.newSuccess(workOrders));
+
+        } catch (Exception e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Response.newFail("获取工单列表时发生内部错误：" + e.getMessage()));
+        }
+    }
+
+    /**
+     * 查看对当前用户未完成的工单列表
+     * HTTP Method: GET
+     * URL: /api/workorders
+     */
+    @GetMapping("/waiting")
     public ResponseEntity<Response<?>> getWorkOrders(HttpSession session) {
 
         Object userDbIdObj = session.getAttribute("userDbId");

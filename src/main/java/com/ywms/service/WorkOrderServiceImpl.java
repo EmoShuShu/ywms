@@ -1,12 +1,9 @@
 package com.ywms.service;
 
-import com.ywms.dao.User;
-import com.ywms.dao.WorkOrder;
+import com.ywms.dao.*;
 import com.ywms.dto.DeliveryRequest;
 import com.ywms.dto.ReviewRequest;
 import com.ywms.dto.WorkOrderCreateRequest;
-import com.ywms.dao.UserRepository;
-import com.ywms.dao.WorkOrderRepository;
 import com.ywms.dto.WorkOrderUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +31,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
      */
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ResponseOrderRepository responseOrderRepository;
 
 
     /**
@@ -71,6 +71,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // 5. 根据业务规则设置初始状态和时间。
         newWorkOrder.setOrderStatus(applicant.getDepartmentA()); // 初始状态=申请者等级
         newWorkOrder.setSendTime(LocalDateTime.now());
+
+        User allocatedUser = userRepository.findRandomApproverByIdentityNumberNative(1).orElse(null);
+        newWorkOrder.setAllocatedId(allocatedUser.getIdentityId());
 
         // 6. 将填充好的实体对象保存到数据库。
         //    JPA 在保存后会自动将数据库生成的 orderId 回填到 newWorkOrder 对象中。
@@ -128,7 +131,43 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
             case 2: // 角色是：审批人员
                 // 查找所有 orderStatus 与自己审批级别 (departmentB) 相同的工单。
-                return workOrderRepository.findByOrderStatus(currentUser.getDepartmentB());
+                return workOrderRepository.findByAllocatedId(currentIdentityId);
+
+            case 3: // 角色是：操作人员
+                // 查找所有 recipientId 是自己主键ID的工单。
+                return workOrderRepository.findByRecipientId(currentIdentityId);
+
+            default: // 角色未定义或无权查看
+                // 返回一个空的列表，表示没有任何可见的工单。
+                // 这样做比返回 null 更安全，可以防止调用方出现空指针异常。
+                return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<WorkOrder> getDoneWorkOrders(int currentIdentityId) {
+        // 1. 根据主键ID获取完整的当前用户信息，因为我们需要它的角色和部门信息。
+        User currentUser = userRepository.findById(currentIdentityId)
+                .orElseThrow(() -> new RuntimeException("无法获取工单列表：当前用户信息不存在"));
+
+        // 2. 使用 switch 语句，根据用户的身份 (identityNumber) 执行不同的查询策略。
+        switch (currentUser.getIdentityNumber()) {
+            case 1: // 角色是：申请者
+                // 查找所有 applicantId 是自己主键ID的工单。
+                return workOrderRepository.findByApplicantId(currentIdentityId);
+
+            case 2: // 角色是：审批人员
+                // 查找所有 orderStatus 与自己审批级别 (departmentB) 相同的工单。（已完成）
+                switch(currentUser.getDepartmentB()){
+                    case 1:
+                        return workOrderRepository.findByApproverIdA(currentIdentityId);
+                    case 2:
+                        return workOrderRepository.findByApproverIdB(currentIdentityId);
+                    case 3:
+                        return workOrderRepository.findByApproverIdC(currentIdentityId);
+                }
+
+                return workOrderRepository.findByAllocatedId(currentIdentityId);
 
             case 3: // 角色是：操作人员
                 // 查找所有 recipientId 是自己主键ID的工单。
@@ -223,9 +262,26 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (request.isApproved()) {
             // --- 审批通过 ---
             int currentStatus = workOrderToReview.getOrderStatus();
+            //设置approverId
+            switch (approver.getDepartmentB()) {
+                case 1: {// 等级是一级
+                    workOrderToReview.setApproverIdA(approver.getIdentityId());
+                    User allocatedUser = userRepository.findRandomApproverByIdentityNumberNative(2).orElse(null);
+                    workOrderToReview.setAllocatedId(allocatedUser.getIdentityId());
+                }
+                case 2: { // 等级是二级
+                    workOrderToReview.setApproverIdB(approver.getIdentityId());
+                    User allocatedUser = userRepository.findRandomApproverByIdentityNumberNative(3).orElse(null);
+                    workOrderToReview.setAllocatedId(allocatedUser.getIdentityId());
+                }
+                case 3: // 角色是：操作人员
+                    workOrderToReview.setApproverIdC(approver.getIdentityId());
+
+            }
 
             if (currentStatus < 3) { // 假设3是最高审批级别
                 workOrderToReview.setOrderStatus(currentStatus + 1);
+
             } else { // currentStatus == 3, 这是最终的省级审批通过
                 //【关键修复点在这里！】
 
@@ -238,7 +294,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
                 // 从数据库中查找一个操作人员 (identityNumber = 3)
                 // findFirst... 是一个假设的方法，我们需要在 UserRepository 中定义它
-                User operatorToAssign = userRepository.findFirstByIdentityNumber(3)
+                User operatorToAssign = userRepository.findRandomByIdentityNumberNative(3)
                         .orElseThrow(() -> new IllegalStateException("系统中没有可用的操作人员来接收工单！"));
 
                 // 将这个操作人员的 ID 和姓名设置到工单中
