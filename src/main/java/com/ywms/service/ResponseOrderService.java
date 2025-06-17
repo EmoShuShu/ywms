@@ -28,4 +28,6 @@ public interface ResponseOrderService {
 
     List<ResponseOrder> findAllByApplicantId(Integer applicantId);
 
+    List<ResponseOrder> findAllByResponseUserId(int responseUserId);
+
 }

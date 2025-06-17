@@ -18,4 +18,6 @@ public interface ResponseOrderRepository extends JpaRepository<ResponseOrder,Str
     Optional<ResponseOrder> findByWorkOrderId(String workOrderId);
 
     List<ResponseOrder> findByWorkOrderIdIn(List<String> workOrderIds);
+
+    List<ResponseOrder> findByResponseUserId(int responseUserId);
 }

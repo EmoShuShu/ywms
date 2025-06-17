@@ -114,9 +114,15 @@ public class ResponseOrderServiceImpl implements ResponseOrderService{
                 .map(WorkOrder::getOrderId) // 假设工单的ID字段getter是getOrderId()
                 .collect(Collectors.toList());
 
-        // 3. vvv--- 这是核心修改 ---vvv
-        //    调用 Repository 中正确命名的 findByWorkOrderIdIn 方法
+        // 3.调用 Repository 中正确命名的 findByWorkOrderIdIn 方法
         return responseOrderRepository.findByWorkOrderIdIn(workOrderIds);
+        //    ^^^--------------------^^^
+    }
+
+    @Override
+    public List<ResponseOrder> findAllByResponseUserId(int responseUserId) {
+
+        return responseOrderRepository.findByResponseUserId(responseUserId);
         //    ^^^--------------------^^^
     }
 
