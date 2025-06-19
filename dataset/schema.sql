@@ -11,7 +11,7 @@
  Target Server Version : 90001 (9.0.1)
  File Encoding         : 65001
 
- Date: 17/06/2025 18:11:47
+ Date: 19/06/2025 15:53:52
 */
 
 SET NAMES utf8mb4;
@@ -39,6 +39,10 @@ CREATE TABLE `report`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Records of report
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for responseorder
 -- ----------------------------
 DROP TABLE IF EXISTS `responseorder`;
@@ -50,8 +54,15 @@ CREATE TABLE `responseorder`  (
   `operatorName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `responseDepartment` int NOT NULL COMMENT '1 ：故障维修部门\n\n​ 2 ：维护部门\n\n​ 3 : 后勤保障部门',
   `workOrderId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `approverIdA` int NULL DEFAULT NULL,
+  `approverIdB` int NULL DEFAULT NULL,
+  `approverIdC` int NULL DEFAULT NULL,
   PRIMARY KEY (`responseId`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of responseorder
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for user
@@ -66,8 +77,21 @@ CREATE TABLE `user`  (
   `departmentA` int NOT NULL COMMENT '1 ：区级\n\n​ 2 ：市级\n\n​ 3 : 省级',
   `departmentB` int NOT NULL COMMENT '1 ：区级\n\n​ 2 ：市级\n\n​ 3 : 省级',
   `departmentC` int NOT NULL COMMENT '1 ：故障维修部门\n\n​ 2 ：维护部门\n\n​ 3 : 后勤保障部门',
-  PRIMARY KEY (`identityId`) USING BTREE
+  PRIMARY KEY (`identityId` DESC) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of user
+-- ----------------------------
+INSERT INTO `user` VALUES (33333333, '33333333Aa', 9, '测试3级操作人员', 3, 0, 0, 3);
+INSERT INTO `user` VALUES (33332222, '33332222Aa', 8, '测试2级操作人员', 3, 0, 0, 2);
+INSERT INTO `user` VALUES (33331111, '33331111Aa', 7, '测试1级操作人员', 3, 0, 0, 1);
+INSERT INTO `user` VALUES (22223333, '22223333Aa', 6, '测试3级审批人员', 2, 0, 3, 0);
+INSERT INTO `user` VALUES (22222222, '22222222Aa', 5, '测试2级审批人员', 2, 0, 2, 0);
+INSERT INTO `user` VALUES (22221111, '22221111Aa', 4, '测试1级审批人员', 2, 0, 1, 0);
+INSERT INTO `user` VALUES (11113333, '11113333Aa', 3, '测试3级人员', 1, 3, 0, 0);
+INSERT INTO `user` VALUES (11112222, '11112222Aa', 2, '测试2级申请人员', 1, 2, 0, 0);
+INSERT INTO `user` VALUES (11111111, '11111111Aa', 1, '测试1级申请人员', 1, 1, 0, 0);
 
 -- ----------------------------
 -- Table structure for workorder
@@ -93,5 +117,10 @@ CREATE TABLE `workorder`  (
   `allocatedId` int NULL DEFAULT NULL,
   PRIMARY KEY (`orderId`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of workorder
+-- ----------------------------
+INSERT INTO `workorder` VALUES ('3928758329', '飞机翅膀断了', 1, '11111111', 1, 1, NULL, NULL, 1, NULL, '2025-06-04 11:18:29', NULL, '2025-06-27 11:18:49', NULL, NULL, NULL, 4);
 
 SET FOREIGN_KEY_CHECKS = 1;
