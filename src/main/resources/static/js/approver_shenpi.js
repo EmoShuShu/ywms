@@ -1,4 +1,5 @@
 console.log('JavaScript approver_shenpi.js is connected!');
+console.log("user: ", user)
 let orders = [];
 let currentIndex = 0;
 function getOrderStatusText(status) {

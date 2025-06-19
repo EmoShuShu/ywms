@@ -1,4 +1,3 @@
-console.log('JavaScript applicant_chuangjian.js is connected!');
 function setMinDeadlineDate() {
   const deadlineInput = document.getElementById('deadline');
   const tomorrow = new Date();
@@ -17,13 +16,12 @@ async function createOrder(event) {
 
   const issueDescription = document.getElementById('issueDescription').value.trim();
   const type = document.getElementById('orderType').value;
-  const deadline = document.getElementById('deadline').value;
-  if (deadlineInput) {
-      const deadline = deadlineInput + "T23:59:59";
-      console.log(deadline);
+  let Deadline = document.getElementById('deadline').value;
+  if (Deadline) {
+      Deadline = Deadline + "T23:59:59";
   }
 
-  if (!issueDescription || !type || !deadline) {
+  if (!issueDescription || !type || !Deadline) {
       alert("请填写所有必填项！");
       return;
   }
@@ -31,18 +29,14 @@ async function createOrder(event) {
   try {
       const response = await fetch('http://localhost:8080/api/workorders', {
           method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: {
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify({
               issueDescription: issueDescription,
               type: parseInt(type, 10),
-              deadlineInput: deadline,
-          }
+              deadline: Deadline,
+          })
       });
-
       const result = await response.json();
-
     if (result.success) {
       alert("工单创建成功！");
       document.getElementById('createOrderForm').reset();

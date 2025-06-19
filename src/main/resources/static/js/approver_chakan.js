@@ -1,4 +1,5 @@
 console.log('JavaScript approver_chakan.js is connected!');
+console.log("user: ", user)
 let orders = [];
 let receipts = [];
 let currentIndex = 0;

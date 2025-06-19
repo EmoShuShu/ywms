@@ -1,4 +1,5 @@
 console.log('JavaScript operator_chakan.js is connected!');
+console.log("user: ", user)
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
@@ -31,7 +32,7 @@ async function loadOrders() {
     const res = await fetch("http://localhost:8080/api/workorders", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user.userId, user.identityNumber })
+      body: JSON.stringify({ userId: user.userId, identityNumber: user.identityNumber })
     });
     console.log("loadOrders res: ", res)
     const data = await res.json();

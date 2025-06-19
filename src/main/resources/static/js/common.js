@@ -1,6 +1,6 @@
 console.log('JavaScript common.js is connected!');
-window.user = JSON.parse(localStorage.getItem("user") || "{}");
-
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+console.log("user: ",user)
 if (!user) {
   alert("未登录或会话过期，请重新登录");
   location.href = "login.html";
@@ -14,16 +14,13 @@ function logout() {
 }
 
 async function showReport() {
-//  const userId = user?.userId;
-
   document.getElementById("reportModal").style.display = "flex";
   const reportContent = document.getElementById("reportContent");
   reportContent.innerHTML = "加载中...";
 
   try {
     const res = await fetch(`http://localhost:8080/api/workorders/report`);
-    const data = await res.json();
-    console.log("data: ", data)
+    let data = await res.json();
 
     if (!data.success) {
       reportContent.innerHTML = `<p style="color:red;">${data.errormsg || "获取报表失败"}</p>`;

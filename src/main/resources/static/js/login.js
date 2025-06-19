@@ -24,7 +24,7 @@ async function login() {
     });
     console.log("res", res)
     if (!res.ok) {
-      throw new Error("1账号或密码错误，请重试");
+      throw new Error("账号或密码错误，请重试");
     }
     const data = await res.json();
     const user = data.data;
@@ -35,6 +35,6 @@ async function login() {
     else if (user.identityNumber === 3) location.href = "operator_chakan.html";
     else alert("未知身份，禁止登录");
   } catch (err) {
-    alert("2账号或密码错误，请重试");
+    alert("账号或密码错误，请重试");
   }
 }
