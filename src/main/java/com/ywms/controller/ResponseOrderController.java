@@ -80,7 +80,7 @@ public class ResponseOrderController {
     }
 
     @GetMapping("/operator/check")
-    public ResponseEntity<List<ResponseOrder>> checkOperatorResponseOrders(HttpSession session) {
+    public ResponseEntity<Response<?>> checkOperatorResponseOrders(HttpSession session) {
         // 从 session 中获取 "userDbId"
         // 这个 ID 对应的是 responseUserId
         Object userIdObj = session.getAttribute("userDbId");
@@ -88,7 +88,7 @@ public class ResponseOrderController {
         // 如果 session 中没有用户信息，说明用户未登录
         if (userIdObj == null) {
             // 返回 401 未授权状态码
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body((Response<?>) Collections.emptyList());
         }
 
         int userId = (int) userIdObj;
@@ -97,11 +97,11 @@ public class ResponseOrderController {
         List<ResponseOrder> responseOrders = responseOrderService.findAllByResponseUserId(userId);
 
         // 返回 200 OK 状态码，并附带数据列表
-        return ResponseEntity.ok(responseOrders);
+        return ResponseEntity.ok(Response.newSuccess(responseOrders));
     }
 
     @GetMapping("/approver/check")
-    public ResponseEntity<List<ResponseOrder>> checkApproverResponseOrders(HttpSession session) {
+    public ResponseEntity<Response<?>> checkApproverResponseOrders(HttpSession session) {
         // 从 session 中获取 "userDbId"
         // 这个 ID 对应的是 responseUserId
         Object userIdObj = session.getAttribute("userDbId");
@@ -109,7 +109,7 @@ public class ResponseOrderController {
         // 如果 session 中没有用户信息，说明用户未登录
         if (userIdObj == null) {
             // 返回 401 未授权状态码
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body((Response<?>) Collections.emptyList());
         }
 
         int userId = (int) userIdObj;
@@ -118,7 +118,7 @@ public class ResponseOrderController {
         List<ResponseOrder> responseOrders = responseOrderService.findAllByApproverId(userId);
 
         // 返回 200 OK 状态码，并附带数据列表
-        return ResponseEntity.ok(responseOrders);
+        return ResponseEntity.ok(Response.newSuccess(responseOrders));
     }
 
 }
