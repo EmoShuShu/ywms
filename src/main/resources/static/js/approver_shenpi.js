@@ -19,7 +19,7 @@ async function loadOrders() {
     const res = await fetch("http://localhost:8080/api/workorders/waiting", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user.userId, user.identityNumber })
+      body: JSON.stringify({ userId: user.userId, identityNumber: user.identityNumber })
     });
     console.log("loadOrders res: ", res)
     const data = await res.json();
@@ -28,7 +28,7 @@ async function loadOrders() {
       document.getElementById("orderCard").innerText = data.errormsg || "加载失败";
       return;
     }
-    orders = data.orders || [];
+    orders = data.data || [];
     if (orders.length === 0) {
       document.getElementById("orderCard").innerText = "暂无工单数据";
     } else {
@@ -38,66 +38,6 @@ async function loadOrders() {
     document.getElementById("orderCard").innerText = "加载失败，请稍后重试";
   }
 }
-//async function loadOrders() {
-//  // 模拟后端返回的数据
-//  const data = {
-//    success: true,
-//    orders: [
-//      {
-//        orderId: 101,
-//        issueDescription: "打印机无法连接",
-//        orderStatus: 1,
-//        applicantName: "张三",
-//        applicantId: 1001,
-//        applicantIdentity: 1,
-//        recipientId: 2001,
-//        recipientName: "李四",
-//        type: 1,
-//        department: 1,
-//        sendTime: "2025-06-01 09:00",
-//        finishTime: null,
-//        deadline: "2025-06-10 17:00"
-//      },
-//      {
-//        orderId: 102,
-//        issueDescription: "网络频繁断开",
-//        orderStatus: 3,
-//        applicantName: "李梅",
-//        applicantId: 1002,
-//        applicantIdentity: 2,
-//        recipientId: 2002,
-//        recipientName: "王五",
-//        type: 2,
-//        department: 2,
-//        sendTime: "2025-06-02 10:30",
-//        finishTime: null,
-//        deadline: "2025-06-12 17:00"
-//      },
-//      {
-//        orderId: 103,
-//        issueDescription: "办公椅损坏",
-//        orderStatus: 5,
-//        applicantName: "赵六",
-//        applicantId: 1003,
-//        applicantIdentity: 1,
-//        recipientId: 2003,
-//        recipientName: "陈七",
-//        type: 3,
-//        department: 3,
-//        sendTime: "2025-06-03 14:15",
-//        finishTime: "2025-06-04 11:00",
-//        deadline: "2025-06-07 17:00"
-//      }
-//    ]
-//  };
-//
-//  orders = data.orders;
-//  if (orders.length === 0) {
-//    document.getElementById("orderCard").innerText = "暂无工单数据";
-//  } else {
-//    showOrder();
-//  }
-//}
 
 function showOrder() {
   const order = orders[currentIndex];
@@ -123,10 +63,10 @@ function showOrder() {
 async function rejectOrder(orderId) {
   if (!confirm("确定要打回该工单吗？")) return;
   try {
-    const res = await fetch(`http://localhost:8080/api/workorders/${orderId}/review`, {
+    const res = await fetch('http://localhost:8080/api/workorders/${orderId}/review', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ false })
+      body: JSON.stringify({ approved: false })
     });
     const result = await res.json();
     console.log("rejectOrder res: ", res)
@@ -135,7 +75,7 @@ async function rejectOrder(orderId) {
       alert("工单已打回");
       loadOrders();
     } else {
-      alert(result.errormsg || "打回失败");
+      alert(result.errormsg || "打回失败，请稍后重试");
     }
   } catch (err) {
     alert("请求失败，请稍后重试");
@@ -145,17 +85,17 @@ async function rejectOrder(orderId) {
 async function approveOrder(orderId) {
   if (!confirm("确定要通过该工单吗？")) return;
   try {
-    const res = await fetch(`http://localhost:8080/api/workorders/${orderId}/review`, {
+    const res = await fetch('http://localhost:8080/api/workorders/${orderId}/review', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ true })
+      body: JSON.stringify({ approved: true })
     });
     const result = await res.json();
     if (result.success) {
       alert("工单已通过");
       loadOrders();
     } else {
-      alert(result.errormsg || "通过失败");
+      alert(result.errormsg || "通过失败，请稍后重试");
     }
   } catch (err) {
     alert("请求失败，请稍后重试");

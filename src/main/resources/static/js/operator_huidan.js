@@ -21,7 +21,7 @@ async function loadOrders() {
       const res = await fetch("http://localhost:8080/api/workorders/waiting", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user.userId, user.identityNumber })
+      body: JSON.stringify({ userId: user.userId, identityNumber: user.identityNumber })
     });
     console.log("loadOrders res: ", res)
     const data = await res.json();
@@ -30,7 +30,7 @@ async function loadOrders() {
       document.getElementById("orderCard").innerText = data.errormsg || "加载失败";
       return;
     }
-    orders = data.orders || [];
+    orders = data.data || [];
     if (orders.length === 0) {
       document.getElementById("orderCard").innerText = "暂无工单数据";
     } else {
@@ -40,67 +40,6 @@ async function loadOrders() {
     document.getElementById("orderCard").innerText = "加载失败，请稍后重试";
   }
 }
-
-//async function loadOrders() {
-//  // 模拟后端返回的数据
-//  const data = {
-//    success: true,
-//    orders: [
-//      {
-//        orderId: '101',
-//        issueDescription: "打印机无法连接",
-//        orderStatus: 1,
-//        applicantName: "张三",
-//        applicantId: 1001,
-//        applicantIdentity: 1,
-//        recipientId: 2001,
-//        recipientName: "李四",
-//        type: 1,
-//        department: 1,
-//        sendTime: "2025-06-01 09:00",
-//        finishTime: null,
-//        deadline: "2025-06-10 17:00"
-//      },
-//      {
-//        orderId: '102',
-//        issueDescription: "网络频繁断开",
-//        orderStatus: 3,
-//        applicantName: "李梅",
-//        applicantId: 1002,
-//        applicantIdentity: 2,
-//        recipientId: 2002,
-//        recipientName: "王五",
-//        type: 2,
-//        department: 2,
-//        sendTime: "2025-06-02 10:30",
-//        finishTime: null,
-//        deadline: "2025-06-12 17:00"
-//      },
-//      {
-//        orderId: '103',
-//        issueDescription: "办公椅损坏",
-//        orderStatus: 5,
-//        applicantName: "赵六",
-//        applicantId: 1003,
-//        applicantIdentity: 1,
-//        recipientId: 2003,
-//        recipientName: "陈七",
-//        type: 3,
-//        department: 3,
-//        sendTime: "2025-06-03 14:15",
-//        finishTime: "2025-06-04 11:00",
-//        deadline: "2025-06-07 17:00"
-//      }
-//    ]
-//  };
-//
-//  orders = data.orders;
-//  if (orders.length === 0) {
-//    document.getElementById("orderCard").innerText = "暂无工单数据";
-//  } else {
-//    showOrder();
-//  }
-//}
 
 function showOrder() {
   currentOrder = orders[currentIndex];
@@ -176,12 +115,8 @@ async function createOrder(event) {
   try {
     const response = await fetch('http://localhost:8080/api/workorders/${orderId}/complete', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({issueDescription: issueDescription,
-                            type: parseInt(type, 10),
-      })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ responseDescription: issueDescription, responseStatus: parseInt(type, 10) })
     });
 
     const result = await response.json();
@@ -212,7 +147,7 @@ async function dispatchOrder(event) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({targetDepartment: parseInt(targetDepartment, 10)})
+      body: JSON.stringify({departmentId: parseInt(targetDepartment, 10)})
     });
     const result = await response.json();
     if (result.success) {
@@ -224,7 +159,7 @@ async function dispatchOrder(event) {
     }
   } catch (error) {
     console.error('Error dispatching order:', error);
-    alert("请求失败，请检查网络或联系管理员。");
+    alert("请求失败，请检查网络或联系管理员");
   }
 }
 

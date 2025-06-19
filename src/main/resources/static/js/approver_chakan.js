@@ -1,10 +1,13 @@
 console.log('JavaScript approver_chakan.js is connected!');
-console.log("user: ", user)
+
+// --- 全局变量声明 ---
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
+
+// --- 辅助函数 (保持不变) ---
 function getOrderStatusText(status) {
-      return {
+    return {
         "-1": "工单被打回",
         1: "进行区审批",
         2: "进行市审批",
@@ -12,203 +15,144 @@ function getOrderStatusText(status) {
         4: "审批通过",
         5: "工单完成",
         6: "工单无法完成"
-      }[status] || "未知状态";
-    }
+    }[status] || "未知状态";
+}
+
 function getReceiptStatusText(status) {
-  return {
-    "1": "已完成",
-    "2": "无法完成"
-  }[status] || "未知状态";
+    return {
+        "1": "已完成",
+        "2": "无法完成"
+    }[status] || "未知状态";
 }
+
 function getDepartmentText(department) {
-  return {
-    "1": "故障维修部门",
-    "2": "维护部门",
-    "3": "后勤保障部门"
-  }[department] || "未知部门";
+    return {
+        "1": "故障维修部门",
+        "2": "维护部门",
+        "3": "后勤保障部门"
+    }[department] || "未知部门";
 }
+
+// --- 数据加载函数 (核心修正) ---
+
+/**
+ * 从后端加载当前审批人需要处理的工单。
+ * 适配 Session-Cookie 认证。
+ */
 async function loadOrders() {
-  try {
-    const res = await fetch("http://localhost:8080/api/workorders/approver/check", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-//      body: JSON.stringify({ user.userId, user.identityNumber })
-    });
-    console.log("loadOrders res: ", res)
-    const data = await res.json();
-    console.log("loadOrders data: ", data)
-    if (!data.success) {
-      document.getElementById("orderCard").innerText = data.errormsg || "加载失败";
-      return;
+    try {
+        // 【修正】后端接口是 /api/workorders/approver/check
+        const url = "http://localhost:8080/api/workorders";
+        const res = await fetch(url, { method: "GET" }); // GET 请求，适配 Session-Cookie
+
+        if (!res.ok) {
+            if (res.status === 401) throw new Error("用户未登录或会话已过期，请重新登录。");
+            throw new Error(`服务器错误，状态码: ${res.status}`);
+        }
+
+        const responseData = await res.json();
+
+        // 【修正】检查后端返回的统一响应结构
+        if (responseData.success) {
+            orders = responseData.data || [];
+            if (orders.length === 0) {
+                document.getElementById("orderCard").innerText = "暂无需要您审批的工单";
+            } else {
+                currentIndex = 0;
+                showOrder();
+            }
+        } else {
+            // 后端返回业务失败
+            throw new Error(responseData.errorMsg || "后端返回业务失败");
+        }
+
+    } catch (err) {
+        console.error("加载待审批工单失败 (loadOrders):", err);
+        document.getElementById("orderCard").innerText = `加载工单失败: ${err.message}`;
     }
-    orders = data.orders || [];
-    if (orders.length === 0) {
-      document.getElementById("orderCard").innerText = "暂无工单数据";
-    } else {
-      showOrder();
-    }
-  } catch (err) {
-    document.getElementById("orderCard").innerText = "加载失败，请稍后重试";
-  }
 }
-//async function loadOrders() {
-//  // 模拟后端返回的数据
-//  const data = {
-//    success: true,
-//    orders: [
-//      {
-//        orderId: '101',
-//        issueDescription: "打印机无法连接",
-//        orderStatus: 1,
-//        applicantName: "张三",
-//        applicantId: 1001,
-//        applicantIdentity: 1,
-//        recipientId: 2001,
-//        recipientName: "李四",
-//        type: 1,
-//        department: 1,
-//        sendTime: "2025-06-01 09:00",
-//        finishTime: null,
-//        deadline: "2025-06-10 17:00"
-//      },
-//      {
-//        orderId: '102',
-//        issueDescription: "网络频繁断开",
-//        orderStatus: 3,
-//        applicantName: "李梅",
-//        applicantId: 1002,
-//        applicantIdentity: 2,
-//        recipientId: 2002,
-//        recipientName: "王五",
-//        type: 2,
-//        department: 2,
-//        sendTime: "2025-06-02 10:30",
-//        finishTime: null,
-//        deadline: "2025-06-12 17:00"
-//      },
-//      {
-//        orderId: '103',
-//        issueDescription: "办公椅损坏",
-//        orderStatus: 5,
-//        applicantName: "赵六",
-//        applicantId: 1003,
-//        applicantIdentity: 1,
-//        recipientId: 2003,
-//        recipientName: "陈七",
-//        type: 3,
-//        department: 3,
-//        sendTime: "2025-06-03 14:15",
-//        finishTime: "2025-06-04 11:00",
-//        deadline: "2025-06-07 17:00"
-//      }
-//    ]
-//  };
-//
-//  orders = data.orders;
-//  if (orders.length === 0) {
-//    document.getElementById("orderCard").innerText = "暂无工单数据";
-//  } else {
-//    showOrder();
-//  }
-//}
 
+/**
+ * 从后端加载与当前审批人相关的回单。
+ * 适配 Session-Cookie 认证。
+ */
+async function loadReceipts() {
+    try {
+        // 【修正】后端接口是 /api/workorders/approver/check，但这里应该是获取回单的接口
+        // 假设获取回单的接口和applicant页面是一样的，如果不是请修改URL
+        const url = 'http://localhost:8080/api/workorders/approver/check';
+        const res = await fetch(url, { method: "GET" });
+
+        if (!res.ok) {
+            if (res.status === 401) throw new Error("用户未登录或会话已过期。");
+            throw new Error(`服务器错误，状态码: ${res.status}`);
+        }
+
+        const responseData = await res.json();
+
+        if (responseData.success) {
+            receipts = responseData.data || [];
+        } else {
+            console.warn("加载回单业务失败:", responseData.errorMsg);
+            receipts = [];
+        }
+
+    } catch (err) {
+        console.error("加载回单失败 (loadReceipts):", err);
+        document.getElementById("receiptCard").innerText = `加载回单失败: ${err.message}`;
+    }
+}
+
+
+// --- UI 显示与交互函数 (逻辑优化) ---
+
+/**
+ * 显示当前 currentIndex 对应的工单和关联的回单。
+ */
 function showOrder() {
-  const order = orders[currentIndex];
-  if (!order) return;
+    if (orders.length === 0 || !orders[currentIndex]) {
+        document.getElementById("orderCard").innerText = "暂无需要您审批的工单";
+        document.getElementById("receiptCard").innerText = "";
+        return;
+    }
 
-  document.getElementById("orderCard").innerHTML = `
+    const order = orders[currentIndex];
+
+    // 【优化】审批人页面可能不需要“撤回”按钮，这里暂时移除，如果需要可以加回来
+    document.getElementById("orderCard").innerHTML = `
     <div class="card">
       <h3>工单编号：${order.orderId}</h3>
       <p><strong>说明：</strong>${order.issueDescription || "（无）"}</p>
       <p><strong>状态：</strong>${getOrderStatusText(order.orderStatus)}</p>
-      <p><strong>发起人：</strong>${order.applicantName || "匿名"}（ID：${order.applicantId || "未知"}，级别：${["", "区级", "市级", "省级"][order.applicantIdentity]}）</p>
+      <p><strong>发起人：</strong>${order.applicantName || "匿名"}（ID：${order.applicantId || "未知"}，级别：${["", "区级", "市级", "省级"][order.applicantIdentity] || '未知'}）</p>
       <p><strong>接收人：</strong>${order.recipientName || "未分配"}（ID：${order.recipientId || "N/A"}）</p>
-      <p><strong>类型：</strong>${["", "故障维修", "维护", "后勤缺失"][order.type]}</p>
-      <p><strong>派送部门：</strong>${["", "故障维修部门", "维护部门", "后勤保障部门"][order.department]}</p>
+      <p><strong>类型：</strong>${["", "故障维修", "维护", "后勤缺失"][order.type] || '未知'}</p>
+      <p><strong>派送部门：</strong>${getDepartmentText(order.department)}</p>
       <p><strong>提交时间：</strong>${order.sendTime || "未提供"}</p>
       <p><strong>截止时间：</strong>${order.deadline || "未提供"}</p>
       <p><strong>完成时间：</strong>${order.finishTime || "未完成"}</p>
     </div>
   `;
-  let flag = -1;
-  const workOrderId = orders[currentIndex].orderId;
-  for (let i = 0; i < receipts.length; i++){
-    if (receipts[i].workOrderId === workOrderId){
-      flag = i;
-      break;
-    }
-  }
-  if (flag > -1) {
-    showReceipt(flag)
-  }
-  else {
-    document.getElementById("receiptCard").innerText = "暂无回单数据";
-  }
-}
 
-async function loadReceipts() {
-  try {
-    const res = await fetch('http://localhost:8080/api/workorders/check');
-    const data = await res.json();
-    console.log("res: ", res)
-    console.log("data: ", data)
-    if (!data.success) {
-      document.getElementById("receiptCard").innerText = data.errormsg || "加载失败";
-      return;
-    }
-    receipts = data.receipts || [];
-    if (receipts.length === 0) {
-      document.getElementById("receiptCard").innerText = "暂无回单数据";
+    // 查找并显示关联的回单
+    const associatedReceipt = receipts.find(receipt => receipt.workOrderId === order.orderId);
+
+    if (associatedReceipt) {
+        showReceipt(associatedReceipt);
     } else {
-      showReceipt();
+        document.getElementById("receiptCard").innerText = "此工单暂无回单数据";
     }
-  } catch (err) {
-    document.getElementById("receiptCard").innerText = "加载失败，请稍后重试";
-  }
 }
-//async function loadReceipts() {
-//  try {
-//    const mockResponse = {
-//      success: true,
-//      data: [
-//        {
-//          responseId: "R-2025-003",
-//          responseDescription: "网络端口已重置，交换机配置已调整，目前连接稳定。",
-//          responseStatus: "1",
-//          responseUserId: 2002,
-//          operatorName: "王五",
-//          responseDepartment: 2,
-//          workOrderId: "102"
-//        },
-//        {
-//          responseId: "R-2025-002",
-//          responseDescription: "经检查，办公椅支架断裂，无法修复，建议更换。",
-//          responseStatus: "2",
-//          responseUserId: 2003,
-//          operatorName: "陈七",
-//          responseDepartment: 3,
-//          workOrderId: "103"
-//        },
-//      ],
-//      errorMsg: null
-//    };
-//
-//    if (!mockResponse.success) {
-//      document.getElementById("receiptCard").innerText = mockResponse.errorMsg || "加载失败";
-//      return;
-//    }
-//
-//    receipts = mockResponse.data || [];
-//  } catch (err) {
-//    document.getElementById("receiptCard").innerText = "加载失败，请稍后重试";
-//  }
-//}
 
-function showReceipt(Index) {
-  const receipt = receipts[Index];
-  if (!receipt) return;
 
-  document.getElementById("receiptCard").innerHTML = `
+/**
+ * 显示单个回单的详情。
+ * @param {object} receipt - 要显示的回单对象。
+ */
+function showReceipt(receipt) {
+    if (!receipt) return;
+
+    document.getElementById("receiptCard").innerHTML = `
     <div class="card">
       <h3>回单编号：${receipt.responseId}</h3>
       <p><strong>关联工单ID：</strong>${receipt.workOrderId}</p>
@@ -220,28 +164,44 @@ function showReceipt(Index) {
   `;
 }
 
-async function loadAllData() {
-  document.getElementById("orderCard").innerText = "加载中...";
-  document.getElementById("receiptCard").innerText = "加载中...";
 
-  try {
+// --- 流程控制与初始化 ---
+
+/**
+ * 页面加载时的总入口函数。
+ */
+async function loadAllData() {
+    // 打印用户信息用于调试
+    console.log("user: ", user);
+
+    document.getElementById("orderCard").innerText = "加载中...";
+    document.getElementById("receiptCard").innerText = "加载中...";
+
     await loadReceipts();
     await loadOrders();
-  } catch (error) {
-    console.error("加载失败:", error);
-  }
-}
-loadAllData()
-function prevOrder() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showOrder();
-  }
+
+    console.log("所有数据加载完成。");
 }
 
-function nextOrder() {
-  if (currentIndex < orders.length - 1) {
-    currentIndex++;
-    showOrder();
-  }
+/**
+ * 切换到上一个工单。
+ */
+function prevOrder() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showOrder();
+    }
 }
+
+/**
+ * 切换到下一个工单。
+ */
+function nextOrder() {
+    if (currentIndex < orders.length - 1) {
+        currentIndex++;
+        showOrder();
+    }
+}
+
+// 页面加载时，自动开始加载所有数据
+loadAllData();

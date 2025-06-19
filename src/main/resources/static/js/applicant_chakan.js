@@ -1,9 +1,14 @@
 console.log('JavaScript applicant_chakan.js is connected!');
+
+// --- 全局变量声明 ---
+// 使用 let 声明，确保它们在全局作用域中只被声明一次
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
+
+// --- 辅助函数 (保持不变) ---
 function getOrderStatusText(status) {
-      return {
+    return {
         "-1": "工单被打回",
         1: "进行区审批",
         2: "进行市审批",
@@ -11,140 +16,146 @@ function getOrderStatusText(status) {
         4: "审批通过",
         5: "工单完成",
         6: "工单无法完成"
-      }[status] || "未知状态";
-    }
+    }[status] || "未知状态";
+}
+
 function getReceiptStatusText(status) {
-  return {
-    "1": "已完成",
-    "2": "无法完成"
-  }[status] || "未知状态";
+    return {
+        "1": "已完成",
+        "2": "无法完成"
+    }[status] || "未知状态";
 }
+
 function getDepartmentText(department) {
-  return {
-    "1": "故障维修部门",
-    "2": "维护部门",
-    "3": "后勤保障部门"
-  }[department] || "未知部门";
+    return {
+        "1": "故障维修部门",
+        "2": "维护部门",
+        "3": "后勤保障部门"
+    }[department] || "未知部门";
 }
+
+// --- 数据加载函数 (核心修正) ---
+
+/**
+ * 从后端加载当前用户的所有工单。
+ * 适配 Session-Cookie 认证，无需手动添加认证头。
+ */
 async function loadOrders() {
-  try {
-    console.log("test1")
-    const res = await fetch("http://localhost:8080/api/workorders", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: user.userId, identityNumber: user.identityNumber })
-    });
-    console.log("test2")
-    const Data = await res.json();
-    console.log("loadOrders res.json(): ", Data)
-    let data = Data.data
-    console.log("loadOrders loadOrders data: ", data)
-    if (!data.success) {
-      document.getElementById("orderCard").innerText = data.errormsg || "加载失败";
-      return;
+    try {
+        const url = "http://localhost:8080/api/workorders";
+        const res = await fetch(url, { method: "GET" }); // GET 请求，无需任何 headers 或 body
+
+        if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error("用户未登录或会话已过期，请重新登录。");
+            }
+            throw new Error(`服务器错误，状态码: ${res.status}`);
+        }
+
+        const responseData = await res.json();
+
+        if (responseData.success) {
+            // 从 responseData.data 中获取工单数组
+            orders = responseData.data || [];
+
+            if (orders.length === 0) {
+                document.getElementById("orderCard").innerText = "暂无工单数据";
+            } else {
+                currentIndex = 0; // 每次加载都从第一个开始显示
+                showOrder();
+            }
+        } else {
+            throw new Error(responseData.errorMsg || "后端返回业务失败");
+        }
+
+    } catch (err) {
+        console.error("加载工单失败 (loadOrders):", err);
+        document.getElementById("orderCard").innerText = `加载工单失败: ${err.message}`;
     }
-    orders = data.orders || [];
-    if (orders.length === 0) {
-      document.getElementById("orderCard").innerText = "暂无工单数据";
-    } else {
-      showOrder();
-    }
-  } catch (err) {
-    document.getElementById("orderCard").innerText = "加载失败，请稍后重试";
-  }
 }
 
-function showOrder() {
-  const order = orders[currentIndex];
-  if (!order) return;
+/**
+ * 从后端加载与当前用户相关的回单。
+ * 适配 Session-Cookie 认证。
+ */
+async function loadReceipts() {
+    try {
+        const url = "http://localhost:8080/api/workorders/check";
+        const res = await fetch(url, { method: "GET" });
 
-  document.getElementById("orderCard").innerHTML = `
+        if (!res.ok) {
+            if (res.status === 401) throw new Error("用户未登录或会话已过期。");
+            throw new Error(`服务器错误，状态码: ${res.status}`);
+        }
+
+        const responseData = await res.json();
+
+        if (responseData.success) {
+            receipts = responseData.data || [];
+        } else {
+            console.warn("加载回单业务失败:", responseData.errorMsg);
+            receipts = []; // 即使业务失败，也确保 receipts 是一个空数组
+        }
+
+    } catch (err) {
+        console.error("加载回单失败 (loadReceipts):", err);
+        // 加载回单失败通常不是致命错误，UI上给出温和提示
+        document.getElementById("receiptCard").innerText = `加载回单失败: ${err.message}`;
+    }
+}
+
+// --- UI 显示与交互函数 (逻辑优化) ---
+
+/**
+ * 显示当前 currentIndex 对应的工单和关联的回单。
+ */
+function showOrder() {
+    if (orders.length === 0 || !orders[currentIndex]) {
+        document.getElementById("orderCard").innerText = "暂无工单数据";
+        document.getElementById("receiptCard").innerText = ""; // 清空回单区域
+        return;
+    }
+
+    const order = orders[currentIndex];
+
+    document.getElementById("orderCard").innerHTML = `
     <div class="card">
       <h3>工单编号：${order.orderId}</h3>
       <p><strong>说明：</strong>${order.issueDescription || "（无）"}</p>
       <p><strong>状态：</strong>${getOrderStatusText(order.orderStatus)}</p>
-      <p><strong>发起人：</strong>${order.applicantName || "匿名"}（ID：${order.applicantId || "未知"}，级别：${["", "区级", "市级", "省级"][order.applicantIdentity]}）</p>
+      <p><strong>发起人：</strong>${order.applicantName || "匿名"}（ID：${order.applicantId || "未知"}，级别：${["", "区级", "市级", "省级"][order.applicantIdentity] || "未知"}）</p>
       <p><strong>接收人：</strong>${order.recipientName || "未分配"}（ID：${order.recipientId || "N/A"}）</p>
-      <p><strong>类型：</strong>${["", "故障维修", "维护", "后勤缺失"][order.type]}</p>
-      <p><strong>派送部门：</strong>${["", "故障维修部门", "维护部门", "后勤保障部门"][order.department]}</p>
+      <p><strong>类型：</strong>${["", "故障维修", "维护", "后勤缺失"][order.type] || "未知"}</p>
+      <p><strong>派送部门：</strong>${getDepartmentText(order.department)}</p>
       <p><strong>提交时间：</strong>${order.sendTime || "未提供"}</p>
       <p><strong>截止时间：</strong>${order.deadline || "未提供"}</p>
       <p><strong>完成时间：</strong>${order.finishTime || "未完成"}</p>
       ${
-        [-1,1,2,3,4].includes(order.orderStatus)
-          ? `<div class="card-actions"><button onclick="cancelOrder(${order.orderId})">撤回工单</button></div>`
+        [-1, 1, 2, 3, 4].includes(order.orderStatus)
+          ? `<div class="card-actions"><button onclick="cancelOrder('${order.orderId}')">撤回工单</button></div>`
           : ''
       }
     </div>
   `;
-  let flag = -1;
-  const workOrderId = orders[currentIndex].orderId;
-  for (let i = 0; i < receipts.length; i++){
-    if (receipts[i].workOrderId === workOrderId){
-      flag = i;
-      break;
-    }
-  }
-  if (flag > -1) {
-    showReceipt(flag)
-  }
-  else {
-    document.getElementById("receiptCard").innerText = "暂无回单数据";
-  }
-}
 
-async function cancelOrder(orderId) {
-  if (!confirm("确定要撤回该工单吗？")) return;
-  try {
-    const res = await fetch(`http://localhost:8080/api/workorders/${orderId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" }
-    });
-    const result = await res.json();
-    console.log("cencelOrder res: ", res)
-    console.log("cencelOrder result: ", result)
-    if (result.success) {
-      alert("工单已撤回");
-      loadOrders();
+    // 查找并显示关联的回单
+    const associatedReceipt = receipts.find(receipt => receipt.workOrderId === order.orderId);
+
+    if (associatedReceipt) {
+        showReceipt(associatedReceipt);
     } else {
-      alert(result.errormsg || "撤回失败");
+        document.getElementById("receiptCard").innerText = "此工单暂无回单数据";
     }
-  } catch (err) {
-    alert("请求失败，请稍后重试");
-  }
 }
 
-async function loadReceipts() {
-  try {
-    const res = await fetch("http://localhost:8080/api/workorders/check", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    const Data = await res.json();
-    let data = Data.data
-    console.log("loadReceipts res: ", res)
-    console.log("loadReceipts res.json(): ", Data)
-    console.log("loadReceipts data: ", data)
-    if (!data.success) {
-      document.getElementById("receiptCard").innerText = data.errormsg || "加载失败";
-      return;
-    }
-    receipts = data.receipts || [];
-    if (receipts.length === 0) {
-      document.getElementById("receiptCard").innerText = "暂无回单数据";
-    } else {
-      showReceipt();
-    }
-  } catch (err) {
-    document.getElementById("receiptCard").innerText = "加载失败，请稍后重试";
-  }
-}
+/**
+ * 显示单个回单的详情。
+ * @param {object} receipt - 要显示的回单对象。
+ */
+function showReceipt(receipt) {
+    if (!receipt) return;
 
-function showReceipt(Index) {
-  const receipt = receipts[Index];
-  if (!receipt) return;
-
-  document.getElementById("receiptCard").innerHTML = `
+    document.getElementById("receiptCard").innerHTML = `
     <div class="card">
       <h3>回单编号：${receipt.responseId}</h3>
       <p><strong>关联工单ID：</strong>${receipt.workOrderId}</p>
@@ -156,30 +167,72 @@ function showReceipt(Index) {
   `;
 }
 
+/**
+ * 撤回工单。
+ * @param {string} orderId - 要撤回的工单ID。
+ */
+async function cancelOrder(orderId) {
+    if (!confirm(`确定要撤回工单 ${orderId} 吗？`)) return;
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/workorders/${orderId}`, {
+            method: "DELETE" // DELETE 请求，适配 Session-Cookie
+        });
+
+        if (!res.ok) {
+            if (res.status === 401) throw new Error("用户未登录或会话已过期。");
+            throw new Error(`服务器响应: ${res.status}`);
+        }
+
+        const result = await res.json();
+        if (result.success) {
+            alert("工单已成功撤回");
+            loadAllData(); // 成功后刷新整个页面数据
+        } else {
+            throw new Error(result.errorMsg || "撤回失败，但未提供原因");
+        }
+    } catch (err) {
+        console.error("撤回工单失败 (cancelOrder):", err);
+        alert(`撤回失败: ${err.message}`);
+    }
+}
+
+
+// --- 流程控制与初始化 ---
+
+/**
+ * 页面加载时的总入口函数。
+ */
 async function loadAllData() {
-  document.getElementById("orderCard").innerText = "加载中...";
-  document.getElementById("receiptCard").innerText = "加载中...";
+    document.getElementById("orderCard").innerText = "加载中...";
+    document.getElementById("receiptCard").innerText = "加载中...";
 
-  try {
+    // 先加载回单，再加载工单。这样显示工单时，可以立即查找关联的回单。
     await loadReceipts();
-    console.log("loadReceipts() success")
     await loadOrders();
-    console.log("loadOrders() success")
-  } catch (error) {
-    console.error("加载失败:", error);
-  }
-}
-loadAllData()
-function prevOrder() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showOrder();
-  }
+
+    console.log("所有数据加载完成。");
 }
 
-function nextOrder() {
-  if (currentIndex < orders.length - 1) {
-    currentIndex++;
-    showOrder();
-  }
+/**
+ * 切换到上一个工单。
+ */
+function prevOrder() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showOrder();
+    }
 }
+
+/**
+ * 切换到下一个工单。
+ */
+function nextOrder() {
+    if (currentIndex < orders.length - 1) {
+        currentIndex++;
+        showOrder();
+    }
+}
+
+// 页面加载时，自动开始加载所有数据
+loadAllData();

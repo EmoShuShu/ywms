@@ -59,24 +59,24 @@ public class ResponseOrderController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<List<ResponseOrder>> checkMyResponseOrders(HttpSession session) {
+    public ResponseEntity<Response<?>> checkMyResponseOrders(HttpSession session) {
         // 从 session 中获取 "userId"
         // 这个 ID 对应的是 WorkOrder 表中的 applicantId
-        Object userIdObj = session.getAttribute("userId");
+        Object userIdObj = session.getAttribute("userDbId");
 
         // 如果 session 中没有用户信息，说明用户未登录
         if (userIdObj == null) {
             // 返回 401 未授权状态码
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body((Response<?>) Collections.emptyList());
         }
 
-        Integer userId = (Integer) userIdObj;
+        Integer userDbId = (Integer) userIdObj;
 
         // 调用 service 层获取数据
-        List<ResponseOrder> responseOrders = responseOrderService.findAllByApplicantId(userId);
+        List<ResponseOrder> responseOrders = responseOrderService.findAllByApplicantId(userDbId);
 
         // 返回 200 OK 状态码，并附带数据列表
-        return ResponseEntity.ok(responseOrders);
+        return ResponseEntity.ok(Response.newSuccess(responseOrders));
     }
 
     @GetMapping("/operator/check")
