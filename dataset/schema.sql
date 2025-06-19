@@ -11,7 +11,7 @@
  Target Server Version : 90001 (9.0.1)
  File Encoding         : 65001
 
- Date: 19/06/2025 15:53:52
+ Date: 20/06/2025 00:09:10
 */
 
 SET NAMES utf8mb4;
@@ -63,6 +63,8 @@ CREATE TABLE `responseorder`  (
 -- ----------------------------
 -- Records of responseorder
 -- ----------------------------
+INSERT INTO `responseorder` VALUES ('1', '1234', '1', 23, '123', 1, '120250619200528', 12, 23, 34);
+INSERT INTO `responseorder` VALUES ('2', '1234567', '1', 7, '测试1级操作人员', 1, '120250619202405', 4, 5, 6);
 
 -- ----------------------------
 -- Table structure for user
@@ -89,7 +91,7 @@ INSERT INTO `user` VALUES (33331111, '33331111Aa', 7, '测试1级操作人员', 
 INSERT INTO `user` VALUES (22223333, '22223333Aa', 6, '测试3级审批人员', 2, 0, 3, 0);
 INSERT INTO `user` VALUES (22222222, '22222222Aa', 5, '测试2级审批人员', 2, 0, 2, 0);
 INSERT INTO `user` VALUES (22221111, '22221111Aa', 4, '测试1级审批人员', 2, 0, 1, 0);
-INSERT INTO `user` VALUES (11113333, '11113333Aa', 3, '测试3级人员', 1, 3, 0, 0);
+INSERT INTO `user` VALUES (11113333, '11113333Aa', 3, '测试3级申请人员', 1, 3, 0, 0);
 INSERT INTO `user` VALUES (11112222, '11112222Aa', 2, '测试2级申请人员', 1, 2, 0, 0);
 INSERT INTO `user` VALUES (11111111, '11111111Aa', 1, '测试1级申请人员', 1, 1, 0, 0);
 
@@ -121,6 +123,9 @@ CREATE TABLE `workorder`  (
 -- ----------------------------
 -- Records of workorder
 -- ----------------------------
-INSERT INTO `workorder` VALUES ('3928758329', '飞机翅膀断了', 1, '11111111', 1, 1, NULL, NULL, 1, NULL, '2025-06-04 11:18:29', NULL, '2025-06-27 11:18:49', NULL, NULL, NULL, 4);
+INSERT INTO `workorder` VALUES ('120250619200528', 'qe', 2, '测试1级申请人员', 1, 1, 0, NULL, 1, 0, '2025-06-19 20:05:28', NULL, '2025-06-22 23:59:59', 4, 4, 4, 6);
+INSERT INTO `workorder` VALUES ('120250619202405', 'asdxz', -1, '测试1级申请人员', 1, 1, 7, NULL, 2, 0, '2025-06-19 20:24:05', NULL, '2025-06-29 23:59:59', 4, 0, 0, 4);
+INSERT INTO `workorder` VALUES ('120250619204912', 'asdw', 1, '测试1级申请人员', 1, 1, 0, NULL, 2, 0, '2025-06-19 20:49:12', NULL, '2025-06-28 23:59:59', 0, 0, 0, 4);
+INSERT INTO `workorder` VALUES ('120250619210200', '3ff', 1, '测试1级申请人员', 1, 1, 8, NULL, 2, 0, '2025-06-19 21:02:00', NULL, '2025-06-28 23:59:59', 0, 0, 0, 4);
 
 SET FOREIGN_KEY_CHECKS = 1;
