@@ -1,3 +1,4 @@
+console.log('JavaScript login.js is connected!');
 function isValidUserId(id) {
   return /^\d{8}$/.test(id);
 }
@@ -23,9 +24,10 @@ async function login() {
     });
     console.log("res", res)
     if (!res.ok) {
-      throw new Error("账号或密码错误，请重试");
+      throw new Error("1账号或密码错误，请重试");
     }
-    const user = await res.json().data;
+    const data = await res.json();
+    const user = data.data;
     console.log("user", user)
     localStorage.setItem("user", JSON.stringify(user));
     if (user.identityNumber === 1) location.href = "applicant_chakan.html";
@@ -33,6 +35,6 @@ async function login() {
     else if (user.identityNumber === 3) location.href = "operator_chakan.html";
     else alert("未知身份，禁止登录");
   } catch (err) {
-    alert("账号或密码错误，请重试");
+    alert("2账号或密码错误，请重试");
   }
 }

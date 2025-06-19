@@ -1,3 +1,4 @@
+console.log('JavaScript applicant_chakan.js is connected!');
 let orders = [];
 let receipts = [];
 let currentIndex = 0;

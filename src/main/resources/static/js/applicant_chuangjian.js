@@ -1,3 +1,4 @@
+console.log('JavaScript applicant_chuangjian.js is connected!');
 function setMinDeadlineDate() {
   const deadlineInput = document.getElementById('deadline');
   const tomorrow = new Date();
@@ -36,7 +37,7 @@ async function createOrder(event) {
           body: {
               issueDescription: issueDescription,
               type: parseInt(type, 10),
-              deadline: deadline,
+              deadlineInput: deadline,
           }
       });
 

@@ -1,3 +1,4 @@
+console.log('JavaScript operator_huidan.js is connected!');
 let orders = [];
 let currentIndex = 0;
 let currentOrder = null;

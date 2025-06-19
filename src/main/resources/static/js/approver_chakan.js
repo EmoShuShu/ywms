@@ -1,3 +1,4 @@
+console.log('JavaScript approver_chakan.js is connected!');
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
@@ -146,7 +147,7 @@ function showOrder() {
 
 async function loadReceipts() {
   try {
-    const res = await fetch(`http://localhost:8080/api/responses?userId=${user.userId}`);
+    const res = await fetch('http://localhost:8080/api/workorders/check');
     const data = await res.json();
     console.log("res: ", res)
     console.log("data: ", data)

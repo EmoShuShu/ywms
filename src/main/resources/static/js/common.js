@@ -1,18 +1,20 @@
-const user = JSON.parse(localStorage.getItem("user"));
+console.log('JavaScript common.js is connected!');
+window.user = JSON.parse(localStorage.getItem("user") || "{}");
 
-//if (!user) {
-//  alert("未登录或会话过期，请重新登录");
-//  location.href = "login.html";
-//} else {
-//  document.getElementById("welcomeText").innerText = `${user.identityName || ""} 欢迎您`;
-//}
+if (!user) {
+  alert("未登录或会话过期，请重新登录");
+  location.href = "login.html";
+} else {
+  document.getElementById("welcomeText").innerText = `${user.identityName || ""} 欢迎您`;
+}
+
 function logout() {
   localStorage.removeItem("user");
   window.location.href = "login.html";
 }
 
 async function showReport() {
-  const userId = user?.userId;
+//  const userId = user?.userId;
 
   document.getElementById("reportModal").style.display = "flex";
   const reportContent = document.getElementById("reportContent");
@@ -27,7 +29,7 @@ async function showReport() {
       reportContent.innerHTML = `<p style="color:red;">${data.errormsg || "获取报表失败"}</p>`;
       return;
     }
-
+    data = data.data
     reportContent.innerHTML = `
       <h4>本周</h4>
       <p>发起工单：${data.weekSendReportNumber ?? "暂无"}</p>
