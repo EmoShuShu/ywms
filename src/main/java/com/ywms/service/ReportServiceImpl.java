@@ -31,7 +31,7 @@ public class ReportServiceImpl implements ReportService{
         ReportDTO report = new ReportDTO();
         LocalDateTime now = LocalDateTime.now();
 
-        // 时间范围计算 (逻辑不变)
+        // 时间范围计算
         LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
 
@@ -41,7 +41,7 @@ public class ReportServiceImpl implements ReportService{
         LocalDateTime startOfYear = now.with(TemporalAdjusters.firstDayOfYear()).toLocalDate().atStartOfDay();
         LocalDateTime endOfYear = now.with(TemporalAdjusters.firstDayOfNextYear()).toLocalDate().atStartOfDay();
 
-        // 统计查询 (逻辑不变，但调用的方法现在返回 int)
+        // 统计查询 调用的方法现在返回 int
 
         // 本周统计
         report.setWeekSendReportNumber(workOrderRepository.countBySendTimeBetween(startOfWeek, endOfWeek));

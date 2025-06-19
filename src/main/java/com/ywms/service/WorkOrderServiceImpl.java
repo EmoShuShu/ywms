@@ -99,7 +99,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         //    - ss:   秒
         //    - SSS:  3位毫秒
         //    这个格式是紧凑的，不包含任何分隔符。
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
         // 2. 获取当前时间，并使用上面的格式化器将其转换为字符串。
         String timePart = LocalDateTime.now().format(formatter);

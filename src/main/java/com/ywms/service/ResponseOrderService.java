@@ -30,4 +30,6 @@ public interface ResponseOrderService {
 
     List<ResponseOrder> findAllByResponseUserId(int responseUserId);
 
+    List<ResponseOrder> findAllByApproverId(int approverId);
+
 }

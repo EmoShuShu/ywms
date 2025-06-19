@@ -71,6 +71,9 @@ public class ResponseOrderServiceImpl implements ResponseOrderService{
         responseOrder.setResponseStatus(String.valueOf(request.getResponseStatus()));
         responseOrder.setResponseUserId(operator.getIdentityId());
         responseOrder.setOperatorName(operator.getIdentityName());
+        responseOrder.setApproverIdA(workOrder.getApproverIdA());
+        responseOrder.setApproverIdB(workOrder.getApproverIdB());
+        responseOrder.setApproverIdC(workOrder.getApproverIdC());
 
         return responseOrderRepository.save(responseOrder);
     }
@@ -124,6 +127,11 @@ public class ResponseOrderServiceImpl implements ResponseOrderService{
 
         return responseOrderRepository.findByResponseUserId(responseUserId);
         //    ^^^--------------------^^^
+    }
+
+    @Override
+    public List<ResponseOrder> findAllByApproverId(int approverId) {
+        return responseOrderRepository.findByApproverIdAOrApproverIdBOrApproverIdC(approverId,approverId,approverId);
     }
 
 

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>操作人 - 发送回单</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/operator_huidan.css" />
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="welcome-text" id="welcomeText">欢迎您</div>
+      <button class="logout-button" onclick="logout()">退出登录</button>
+    </div>
+
+    <div class="main">
+      <div class="sidebar">
+        <button onclick="location.href='operator_chakan.html'">查看工单</button>
+        <button onclick="location.href='operator_huidan.html'">发送回单</button>
+        <button onclick="showReport()">查看报表</button>
+      </div>
+      <div class="content">
+        <h2>您的工单</h2>
+        <div id="orderCard"></div>
+        <div class="card-nav">
+          <button onclick="prevOrder()">← 上一个</button>
+          <button onclick="nextOrder()">下一个 →</button>
+        </div>
+        <div class="form-container">
+          <div class="form-switch-buttons">
+            <button class="form-switch-button active" onclick="switchForm('send')">发送回单</button>
+            <button class="form-switch-button" onclick="switchForm('dispatch')">派送工单</button>
+          </div>
+
+          <!-- 发送回单表单 -->
+          <div id="sendForm" class="form-content active">
+            <form id="createOrderForm">
+              <div class="form-group">
+                <label for="issueDescription">回单描述</label>
+                <textarea id="issueDescription" placeholder="请详细描述您回单的状况..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="orderType">回单状态</label>
+                <select id="orderType" required>
+                  <option value="" disabled selected>-- 请选择回单状态 --</option>
+                  <option value="1">已完成</option>
+                  <option value="2">无法完成</option>
+                </select>
+              </div>
+              <button type="submit" class="submit-button">发送回单</button>
+            </form>
+          </div>
+
+          <!-- 派送工单表单 -->
+          <div id="dispatchForm" class="form-content">
+            <form id="dispatchOrderForm">
+              <div class="form-group">
+                <label for="targetDepartment">目标部门</label>
+                <select id="targetDepartment" required>
+                  <option value="" disabled selected>-- 请选择目标部门 --</option>
+                  <option value="1">故障维修部门</option>
+                  <option value="2">维护部门</option>
+                  <option value="3">后勤保障部门</option>
+                </select>
+              </div>
+              <button type="submit" class="submit-button">派送工单</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 报表弹窗 -->
+    <div id="reportModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>工单报表</h3>
+        <div id="reportContent">加载中...</div>
+      </div>
+    </div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/operator_huidan.js"></script>
+  </body>
+</html>

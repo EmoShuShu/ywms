@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>申请人 - 创建工单</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/applicant_chuangjian.css" />
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="welcome-text" id="welcomeText">欢迎您</div>
+      <button class="logout-button" onclick="logout()">退出登录</button>
+    </div>
+
+    <div class="main">
+      <div class="sidebar">
+        <button onclick="location.href='applicant_chakan.html'">查看工单</button>
+        <button onclick="location.href='applicant_chuangjian.html'">创建工单</button>
+        <button onclick="showReport()">查看报表</button>
+      </div>
+      <div class="content">
+        <h2>创建新工单</h2>
+        <div class="form-container">
+          <form id="createOrderForm">
+            <div class="form-group">
+              <label for="issueDescription">工单说明</label>
+              <textarea id="issueDescription" placeholder="请详细描述您遇到的问题..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="orderType">工单类型</label>
+              <select id="orderType" required>
+                <option value="" disabled selected>-- 请选择工单类型 --</option>
+                <option value="1">故障维修问题</option>
+                <option value="2">维护问题</option>
+                <option value="3">后勤缺失</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="deadline">预计截至日期</label>
+              <input type="date" id="deadline" required>
+            </div>
+            <button type="submit" class="submit-button">创建工单</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 报表弹窗 -->
+    <div id="reportModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">×</span>
+        <h3>工单报表</h3>
+        <div id="reportContent">加载中...</div>
+      </div>
+    </div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/applicant_chuangjian.js"></script>
+  </body>
+</html>

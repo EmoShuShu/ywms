@@ -31,6 +31,15 @@ public class ResponseOrder {
     @Column
     private String workOrderId;
 
+    @Column
+    private int approverIdA;
+
+    @Column
+    private int approverIdB;
+
+    @Column
+    private int approverIdC;
+
     public String getWorkOrderId() {
         return workOrderId;
     }
@@ -85,5 +94,29 @@ public class ResponseOrder {
 
     public void setResponseDepartment(int responseDepartment) {
         this.responseDepartment = responseDepartment;
+    }
+
+    public int getApproverIdA() {
+        return approverIdA;
+    }
+
+    public void setApproverIdA(int approverIdA) {
+        this.approverIdA = approverIdA;
+    }
+
+    public int getApproverIdB() {
+        return approverIdB;
+    }
+
+    public void setApproverIdB(int approverIdB) {
+        this.approverIdB = approverIdB;
+    }
+
+    public int getApproverIdC() {
+        return approverIdC;
+    }
+
+    public void setApproverIdC(int approverIdC) {
+        this.approverIdC = approverIdC;
     }
 }
