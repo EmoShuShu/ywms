@@ -9,12 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ResponseOrderRepository extends JpaRepository<ResponseOrder,String> {
 
-    /**
-     * 根据关联的工单ID查找回单。
-     * 因为一个工单理论上只有一个回单，所以返回 Optional<ResponseOrder>。
-     * @param workOrderId 关联的工单ID。
-     * @return 包含回单信息的 Optional 对象。
-     */
+    
     Optional<ResponseOrder> findByWorkOrderId(String workOrderId);
 
     List<ResponseOrder> findByWorkOrderIdIn(List<String> workOrderIds);

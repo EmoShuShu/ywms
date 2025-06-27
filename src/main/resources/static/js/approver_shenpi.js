@@ -1,12 +1,12 @@
 console.log('JavaScript approver_shenpi.js is connected!');
-// 在脚本开始时打印user，用于调试
+
 console.log("user at script start: ", typeof user !== 'undefined' ? user : 'user is not defined yet');
 
-// --- 全局变量声明 ---
+
 let orders = [];
 let currentIndex = 0;
 
-// --- 辅助函数 ---
+
 function getOrderStatusText(status) {
     return {
         "-1": "工单被打回",
@@ -20,16 +20,13 @@ function getOrderStatusText(status) {
 }
 
 
-// --- 数据加载函数 (核心修正) ---
 
-/**
- * 从后端加载待审批的工单列表。
- * 适配 Session-Cookie 认证。
- */
+
+
 async function loadOrders() {
     try {
-        const url = "http://localhost:8080/api/workorders/waiting";
-        // 【修正】GET请求，适配Session-Cookie，无需任何 headers 或 body
+        const url = "http:
+
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -58,7 +55,7 @@ async function loadOrders() {
 }
 
 
-// --- UI 显示与交互函数 ---
+
 
 function showOrder() {
     if (orders.length === 0 || !orders[currentIndex]) {
@@ -88,18 +85,14 @@ function showOrder() {
 }
 
 
-/**
- * 统一处理审批操作（通过或打回）。
- * @param {string} orderId - 要审批的工单ID。
- * @param {boolean} isApproved - true表示通过，false表示打回。
- */
+
 async function reviewOrder(orderId, isApproved) {
     const actionText = isApproved ? "通过" : "打回";
     if (!confirm(`确定要${actionText}该工单吗？`)) return;
 
     try {
-        // 【修正】使用反引号 ` (模板字符串) 来构造URL
-        const url = `http://localhost:8080/api/workorders/${orderId}/review`;
+
+        const url = `http:
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -114,7 +107,7 @@ async function reviewOrder(orderId, isApproved) {
         const result = await res.json();
         if (result.success) {
             alert(`工单已${actionText}`);
-            // 刷新列表以移除已处理的工单
+
             loadOrders();
         } else {
             throw new Error(result.errorMsg || `${actionText}失败`);
@@ -126,9 +119,9 @@ async function reviewOrder(orderId, isApproved) {
 }
 
 
-// --- 流程控制与初始化 ---
 
-// 页面加载时自动加载待审批工单
+
+
 loadOrders();
 
 function prevOrder() {
@@ -145,10 +138,10 @@ function nextOrder() {
     }
 }
 
-// 报表相关的函数 (从HTML中看到，这里补充定义)
+
 function showReport() {
     document.getElementById('reportModal').style.display = 'block';
-    // 在这里可以添加加载报表数据的逻辑
+
 }
 
 function closeModal() {

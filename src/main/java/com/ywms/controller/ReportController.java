@@ -20,12 +20,12 @@ public class ReportController {
 
     @GetMapping("/report")
     public ResponseEntity<Response<?>> getReport() {
-        // 这个接口通常不需要登录，或者是管理员权限，我们暂时简化为公开访问
+        
         try {
             ReportDTO report = reportService.generateReport();
             return ResponseEntity.ok(Response.newSuccess(report));
         } catch (Exception e) {
-            // 捕获可能的数据库异常等
+            
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Response.newFail("生成报告时发生错误：" + e.getMessage()));

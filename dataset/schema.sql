@@ -1,18 +1,4 @@
-/*
- Navicat Premium Dump SQL
 
- Source Server         : ywms
- Source Server Type    : MySQL
- Source Server Version : 90001 (9.0.1)
- Source Host           : localhost:3306
- Source Schema         : ywms
-
- Target Server Type    : MySQL
- Target Server Version : 90001 (9.0.1)
- File Encoding         : 65001
-
- Date: 20/06/2025 00:09:10
-*/
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

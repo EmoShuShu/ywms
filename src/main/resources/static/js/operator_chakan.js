@@ -1,12 +1,12 @@
 console.log('JavaScript operator_chakan.js is connected!');
 console.log("user: ", user);
 
-// --- 全局变量声明 ---
+
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
 
-// --- 辅助函数 (保持不变) ---
+
 function getOrderStatusText(status) {
     return { "-1": "工单被打回", 1: "进行区审批", 2: "进行市审批", 3: "进行省审批", 4: "审批通过", 5: "工单完成", 6: "工单无法完成" }[status] || "未知状态";
 }
@@ -18,17 +18,14 @@ function getDepartmentText(department) {
 }
 
 
-// --- 数据加载函数 (核心修正) ---
 
-/**
- * 从后端加载分配给当前操作员的工单。
- * 适配 Session-Cookie 认证。
- */
+
+
 async function loadOrders() {
     try {
-        // 【修正】这里需要一个专门为操作员获取已分配工单的接口URL
-        // 我暂时用一个占位符，请根据你的后端Controller进行替换
-        const url = "http://localhost:8080/api/workorders"; // <--- !! 请确认这个URL是否正确 !!
+
+
+        const url = "http:
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -54,14 +51,11 @@ async function loadOrders() {
     }
 }
 
-/**
- * 从后端加载与当前操作员相关的回单。
- * 适配 Session-Cookie 认证。
- */
+
 async function loadReceipts() {
     try {
-        // 这个URL之前已确认是正确的
-        const url = 'http://localhost:8080/api/workorders/operator/check';
+
+        const url = 'http:
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -83,7 +77,7 @@ async function loadReceipts() {
 }
 
 
-// --- UI 显示与交互函数 ---
+
 
 function showOrder() {
     if (orders.length === 0 || !orders[currentIndex]) {
@@ -116,7 +110,7 @@ function showOrder() {
     }
 }
 
-function showReceipt(receipt) { // 注意：参数应该是receipt对象，而不是Index
+function showReceipt(receipt) {
     if (!receipt) return;
     document.getElementById("receiptCard").innerHTML = `
     <div class="card">
@@ -131,7 +125,7 @@ function showReceipt(receipt) { // 注意：参数应该是receipt对象，而�
 }
 
 
-// --- 流程控制与初始化 ---
+
 
 async function loadAllData() {
     document.getElementById("orderCard").innerText = "加载中...";

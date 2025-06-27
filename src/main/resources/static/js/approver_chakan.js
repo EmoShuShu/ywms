@@ -1,11 +1,11 @@
 console.log('JavaScript approver_chakan.js is connected!');
 
-// --- 全局变量声明 ---
+
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
 
-// --- 辅助函数 (保持不变) ---
+
 function getOrderStatusText(status) {
     return {
         "-1": "工单被打回",
@@ -33,17 +33,14 @@ function getDepartmentText(department) {
     }[department] || "未知部门";
 }
 
-// --- 数据加载函数 (核心修正) ---
 
-/**
- * 从后端加载当前审批人需要处理的工单。
- * 适配 Session-Cookie 认证。
- */
+
+
 async function loadOrders() {
     try {
-        // 【修正】后端接口是 /api/workorders/approver/check
-        const url = "http://localhost:8080/api/workorders";
-        const res = await fetch(url, { method: "GET" }); // GET 请求，适配 Session-Cookie
+
+        const url = "http:
+        const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
             if (res.status === 401) throw new Error("用户未登录或会话已过期，请重新登录。");
@@ -52,7 +49,7 @@ async function loadOrders() {
 
         const responseData = await res.json();
 
-        // 【修正】检查后端返回的统一响应结构
+
         if (responseData.success) {
             orders = responseData.data || [];
             if (orders.length === 0) {
@@ -62,7 +59,7 @@ async function loadOrders() {
                 showOrder();
             }
         } else {
-            // 后端返回业务失败
+
             throw new Error(responseData.errorMsg || "后端返回业务失败");
         }
 
@@ -72,15 +69,12 @@ async function loadOrders() {
     }
 }
 
-/**
- * 从后端加载与当前审批人相关的回单。
- * 适配 Session-Cookie 认证。
- */
+
 async function loadReceipts() {
     try {
-        // 【修正】后端接口是 /api/workorders/approver/check，但这里应该是获取回单的接口
-        // 假设获取回单的接口和applicant页面是一样的，如果不是请修改URL
-        const url = 'http://localhost:8080/api/workorders/approver/check';
+
+
+        const url = 'http:
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -104,11 +98,9 @@ async function loadReceipts() {
 }
 
 
-// --- UI 显示与交互函数 (逻辑优化) ---
 
-/**
- * 显示当前 currentIndex 对应的工单和关联的回单。
- */
+
+
 function showOrder() {
     if (orders.length === 0 || !orders[currentIndex]) {
         document.getElementById("orderCard").innerText = "暂无需要您审批的工单";
@@ -118,7 +110,7 @@ function showOrder() {
 
     const order = orders[currentIndex];
 
-    // 【优化】审批人页面可能不需要“撤回”按钮，这里暂时移除，如果需要可以加回来
+
     document.getElementById("orderCard").innerHTML = `
     <div class="card">
       <h3>工单编号：${order.orderId}</h3>
@@ -134,7 +126,7 @@ function showOrder() {
     </div>
   `;
 
-    // 查找并显示关联的回单
+
     const associatedReceipt = receipts.find(receipt => receipt.workOrderId === order.orderId);
 
     if (associatedReceipt) {
@@ -145,10 +137,7 @@ function showOrder() {
 }
 
 
-/**
- * 显示单个回单的详情。
- * @param {object} receipt - 要显示的回单对象。
- */
+
 function showReceipt(receipt) {
     if (!receipt) return;
 
@@ -165,13 +154,11 @@ function showReceipt(receipt) {
 }
 
 
-// --- 流程控制与初始化 ---
 
-/**
- * 页面加载时的总入口函数。
- */
+
+
 async function loadAllData() {
-    // 打印用户信息用于调试
+
     console.log("user: ", user);
 
     document.getElementById("orderCard").innerText = "加载中...";
@@ -183,9 +170,7 @@ async function loadAllData() {
     console.log("所有数据加载完成。");
 }
 
-/**
- * 切换到上一个工单。
- */
+
 function prevOrder() {
     if (currentIndex > 0) {
         currentIndex--;
@@ -193,9 +178,7 @@ function prevOrder() {
     }
 }
 
-/**
- * 切换到下一个工单。
- */
+
 function nextOrder() {
     if (currentIndex < orders.length - 1) {
         currentIndex++;
@@ -203,5 +186,5 @@ function nextOrder() {
     }
 }
 
-// 页面加载时，自动开始加载所有数据
+
 loadAllData();

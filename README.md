@@ -1,9 +1,9 @@
 # YWMS - 工单管理系统后端 (Work Order Management System)
 
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![JPA](https://img.shields.io/badge/JPA-Hibernate-blue.svg)](https://hibernate.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL%208-blue.svg)](https://www.mysql.com/)
+[![Java](https:
+[![Spring Boot](https:
+[![JPA](https:
+[![MySQL](https:
 
 这是一个基于 Spring Boot 实现的工单管理系统后端服务。它提供了一套完整的 RESTful API，用于处理用户认证、工单的创建、审批、流转、完成和统计等核心业务流程。
 
@@ -51,7 +51,7 @@
 
     ```properties
     # 数据库连接
-    spring.datasource.url=jdbc:mysql://localhost:3306/ywms_db?useSSL=false&serverTimezone=Asia/Shanghai
+    spring.datasource.url=jdbc:mysql:
     spring.datasource.username=[你的数据库用户名, 例如: root]
     spring.datasource.password=[你的数据库密码]
     ```
@@ -71,13 +71,13 @@
     mvn spring-boot:run
     ```
 
-当你在控制台看到 `Tomcat started on port(s): 8080` 的日志时，代表后端服务已成功启动！服务地址为 `http://localhost:8080`。
+当你在控制台看到 `Tomcat started on port(s): 8080` 的日志时，代表后端服务已成功启动！服务地址为 `http:
 
 ## 7. API 文档
 
 所有 API 的详细信息、请求/响应格式、参数说明和在线测试功能，请访问我们的 Apifox 在线文档：
 
-https://apifox.com/apidoc/shared-ee9e492d-f45b-46e1-b6c7-c155e30333ee
+https:
 
 > **测试流程提醒**:
 > 1.  所有需要登录的接口，都必须先调用 `POST /api/users/login` 接口。

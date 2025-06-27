@@ -31,7 +31,7 @@ public class ReportServiceImpl implements ReportService{
         ReportDTO report = new ReportDTO();
         LocalDateTime now = LocalDateTime.now();
 
-        // 时间范围计算
+        
         LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
 
@@ -41,24 +41,24 @@ public class ReportServiceImpl implements ReportService{
         LocalDateTime startOfYear = now.with(TemporalAdjusters.firstDayOfYear()).toLocalDate().atStartOfDay();
         LocalDateTime endOfYear = now.with(TemporalAdjusters.firstDayOfNextYear()).toLocalDate().atStartOfDay();
 
-        // 统计查询 调用的方法现在返回 int
+        
 
-        // 本周统计
+        
         report.setWeekSendReportNumber(workOrderRepository.countBySendTimeBetween(startOfWeek, endOfWeek));
         report.setWeekFinishedReportNumber(workOrderRepository.countFinishedByFinishTimeBetween(startOfWeek, endOfWeek));
         report.setWeekUnfinishedReportNumber(report.getWeekSendReportNumber() - report.getWeekFinishedReportNumber());
 
-        // 本月统计
+        
         report.setMonthSendReportNumber(workOrderRepository.countBySendTimeBetween(startOfMonth, endOfMonth));
         report.setMonthFinishedReportNumber(workOrderRepository.countFinishedByFinishTimeBetween(startOfMonth, endOfMonth));
         report.setMonthUnfinishedReportNumber(report.getMonthSendReportNumber() - report.getMonthFinishedReportNumber());
 
-        // 本年统计
+        
         report.setYearSendReportNumber(workOrderRepository.countBySendTimeBetween(startOfYear, endOfYear));
         report.setYearFinishedReportNumber(workOrderRepository.countFinishedByFinishTimeBetween(startOfYear, endOfYear));
         report.setYearUnfinishedReportNumber(report.getYearSendReportNumber() - report.getYearFinishedReportNumber());
 
-        // 总计 - 调用我们新的返回 int 的方法
+        
         report.setTotalSendReportNumber(workOrderRepository.countTotal());
         report.setTotalFinishedReportNumber(workOrderRepository.countTotalFinished());
         report.setTotalUnfinishedReportNumber(report.getTotalSendReportNumber() - report.getTotalFinishedReportNumber());

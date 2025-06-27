@@ -1,12 +1,12 @@
 console.log('JavaScript applicant_chakan.js is connected!');
 
-// --- 全局变量声明 ---
-// 使用 let 声明，确保它们在全局作用域中只被声明一次
+
+
 let orders = [];
 let receipts = [];
 let currentIndex = 0;
 
-// --- 辅助函数 (保持不变) ---
+
 function getOrderStatusText(status) {
     return {
         "-1": "工单被打回",
@@ -34,16 +34,13 @@ function getDepartmentText(department) {
     }[department] || "未知部门";
 }
 
-// --- 数据加载函数 (核心修正) ---
 
-/**
- * 从后端加载当前用户的所有工单。
- * 适配 Session-Cookie 认证，无需手动添加认证头。
- */
+
+
 async function loadOrders() {
     try {
-        const url = "http://localhost:8080/api/workorders";
-        const res = await fetch(url, { method: "GET" }); // GET 请求，无需任何 headers 或 body
+        const url = "http:
+        const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
             if (res.status === 401) {
@@ -55,13 +52,13 @@ async function loadOrders() {
         const responseData = await res.json();
 
         if (responseData.success) {
-            // 从 responseData.data 中获取工单数组
+
             orders = responseData.data || [];
 
             if (orders.length === 0) {
                 document.getElementById("orderCard").innerText = "暂无工单数据";
             } else {
-                currentIndex = 0; // 每次加载都从第一个开始显示
+                currentIndex = 0;
                 showOrder();
             }
         } else {
@@ -74,13 +71,10 @@ async function loadOrders() {
     }
 }
 
-/**
- * 从后端加载与当前用户相关的回单。
- * 适配 Session-Cookie 认证。
- */
+
 async function loadReceipts() {
     try {
-        const url = "http://localhost:8080/api/workorders/check";
+        const url = "http:
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -94,25 +88,23 @@ async function loadReceipts() {
             receipts = responseData.data || [];
         } else {
             console.warn("加载回单业务失败:", responseData.errorMsg);
-            receipts = []; // 即使业务失败，也确保 receipts 是一个空数组
+            receipts = [];
         }
 
     } catch (err) {
         console.error("加载回单失败 (loadReceipts):", err);
-        // 加载回单失败通常不是致命错误，UI上给出温和提示
+
         document.getElementById("receiptCard").innerText = `加载回单失败: ${err.message}`;
     }
 }
 
-// --- UI 显示与交互函数 (逻辑优化) ---
 
-/**
- * 显示当前 currentIndex 对应的工单和关联的回单。
- */
+
+
 function showOrder() {
     if (orders.length === 0 || !orders[currentIndex]) {
         document.getElementById("orderCard").innerText = "暂无工单数据";
-        document.getElementById("receiptCard").innerText = ""; // 清空回单区域
+        document.getElementById("receiptCard").innerText = "";
         return;
     }
 
@@ -138,7 +130,7 @@ function showOrder() {
     </div>
   `;
 
-    // 查找并显示关联的回单
+
     const associatedReceipt = receipts.find(receipt => receipt.workOrderId === order.orderId);
 
     if (associatedReceipt) {
@@ -148,10 +140,7 @@ function showOrder() {
     }
 }
 
-/**
- * 显示单个回单的详情。
- * @param {object} receipt - 要显示的回单对象。
- */
+
 function showReceipt(receipt) {
     if (!receipt) return;
 
@@ -167,16 +156,13 @@ function showReceipt(receipt) {
   `;
 }
 
-/**
- * 撤回工单。
- * @param {string} orderId - 要撤回的工单ID。
- */
+
 async function cancelOrder(orderId) {
     if (!confirm(`确定要撤回工单 ${orderId} 吗？`)) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/workorders/${orderId}`, {
-            method: "DELETE" // DELETE 请求，适配 Session-Cookie
+        const res = await fetch(`http:
+            method: "DELETE"
         });
 
         if (!res.ok) {
@@ -187,7 +173,7 @@ async function cancelOrder(orderId) {
         const result = await res.json();
         if (result.success) {
             alert("工单已成功撤回");
-            loadAllData(); // 成功后刷新整个页面数据
+            loadAllData();
         } else {
             throw new Error(result.errorMsg || "撤回失败，但未提供原因");
         }
@@ -198,25 +184,21 @@ async function cancelOrder(orderId) {
 }
 
 
-// --- 流程控制与初始化 ---
 
-/**
- * 页面加载时的总入口函数。
- */
+
+
 async function loadAllData() {
     document.getElementById("orderCard").innerText = "加载中...";
     document.getElementById("receiptCard").innerText = "加载中...";
 
-    // 先加载回单，再加载工单。这样显示工单时，可以立即查找关联的回单。
+
     await loadReceipts();
     await loadOrders();
 
     console.log("所有数据加载完成。");
 }
 
-/**
- * 切换到上一个工单。
- */
+
 function prevOrder() {
     if (currentIndex > 0) {
         currentIndex--;
@@ -224,9 +206,7 @@ function prevOrder() {
     }
 }
 
-/**
- * 切换到下一个工单。
- */
+
 function nextOrder() {
     if (currentIndex < orders.length - 1) {
         currentIndex++;
@@ -234,5 +214,5 @@ function nextOrder() {
     }
 }
 
-// 页面加载时，自动开始加载所有数据
+
 loadAllData();

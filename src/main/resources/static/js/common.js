@@ -19,7 +19,7 @@ async function showReport() {
   reportContent.innerHTML = "加载中...";
 
   try {
-    const res = await fetch(`http://localhost:8080/api/workorders/report`);
+    const res = await fetch(`http:
     let data = await res.json();
 
     if (!data.success) {
